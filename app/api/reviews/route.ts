@@ -3,28 +3,45 @@ import { connectToDatabase } from '@/lib/db'
 import Review, { IReview } from '@/models/Review'
 import { NextRequest, NextResponse } from 'next/server'
 
-// Utility function to set CORS headers
-function setCORSHeaders(response: NextResponse) {
-  response.headers.set('Access-Control-Allow-Origin', '*') // Replace * with your frontend origin in production
-  response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-  response.headers.set('Access-Control-Allow-Headers', 'Content-Type, x-api-secret')
-  return response
+
+const allowedOrigins = [
+  'https://saad-1731.myshopify.com',
+  'https://kadobeapparel.store',
+  'https://humaira-haven.myshopify.com/',
+  'https://innerabd.com/',
+  'http://localhost:3000',
+]
+
+// 👇 Use local helper
+function setCORSHeaders(req: NextRequest, res: NextResponse) {
+  const origin = req.headers.get('origin')
+
+  if (process.env.NODE_ENV === 'production') {
+    res.headers.set('Access-Control-Allow-Origin', '*')
+  } else {
+    const allowedOrigins = ['http://localhost:3000']
+    if (origin && allowedOrigins.includes(origin)) {
+      res.headers.set('Access-Control-Allow-Origin', origin)
+    }
+  }
+
+  res.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+  res.headers.set('Access-Control-Allow-Headers', 'Content-Type, x-api-secret')
+  return res
 }
 
-// Handle OPTIONS preflight request
 export async function OPTIONS(req: NextRequest) {
-  const res = new NextResponse(null, { status: 204 }) // No content
-  return setCORSHeaders(res)
+  const res = new NextResponse(null, { status: 204 })
+  return setCORSHeaders(req, res)
 }
 
-// GET /api/reviews?productId=...
 export async function GET(req: NextRequest) {
   await connectToDatabase()
 
   const secret = req.headers.get('x-api-secret')
   if (secret !== process.env.API_SECRET_KEY) {
     const res = NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
-    return setCORSHeaders(res)
+    return setCORSHeaders(req, res)
   }
 
   const productId = req.nextUrl.searchParams.get('productId')
@@ -32,10 +49,9 @@ export async function GET(req: NextRequest) {
 
   const reviews: IReview[] = await Review.find(query).sort({ createdAt: -1 })
   const res = NextResponse.json(reviews)
-  return setCORSHeaders(res)
+  return setCORSHeaders(req, res)
 }
 
-// POST /api/reviews
 export async function POST(req: NextRequest) {
   await connectToDatabase()
   const data = await req.json()
@@ -43,13 +59,13 @@ export async function POST(req: NextRequest) {
   const secret = req.headers.get('x-api-secret')
   if (secret !== process.env.API_SECRET_KEY) {
     const res = NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
-    return setCORSHeaders(res)
+    return setCORSHeaders(req, res)
   }
 
   const { productId, rating, customerName, comment } = data
   if (!productId || !rating) {
     const res = NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
-    return setCORSHeaders(res)
+    return setCORSHeaders(req, res)
   }
 
   const newReview = new Review({
@@ -60,7 +76,6 @@ export async function POST(req: NextRequest) {
   })
 
   await newReview.save()
-
   const res = NextResponse.json(newReview, { status: 201 })
-  return setCORSHeaders(res)
+  return setCORSHeaders(req, res)
 }
