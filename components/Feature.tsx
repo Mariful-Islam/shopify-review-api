@@ -27,7 +27,7 @@ function Feature() {
     <div className="px-6 py-12" id="feature">
       <h2 className="text-xl font-bold">Features</h2>
 
-      <div className="grid grid-cols-3 gap-6 justify-between items-center mt-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 justify-between items-center mt-6">
         {items.map((item, i) => (
           <div
             key={i}

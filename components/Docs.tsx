@@ -24,7 +24,7 @@ function Docs() {
             1. API for get all reviews by product id
             <CodeBlock language="bash" code={apiEndpoint} />
           </span>
-          <span className="mt-6">
+          <div className="mt-6">
             2. API for create review for Product and header and payload.
             <CodeBlock language="bash" code={apiEndpoint} />
             API secret
@@ -42,7 +42,7 @@ function Docs() {
   "comment": "Nice Pc!"
 }`}
             />
-          </span>
+          </div>
         </p>
       </div>
 
