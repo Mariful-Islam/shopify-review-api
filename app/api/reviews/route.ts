@@ -4,7 +4,7 @@ import Review, {IReview} from '@/models/Review'
 import { NextRequest, NextResponse } from 'next/server'
 
 // GET /api/reviews?productId=...
-export async function GET(req: NextRequest, res: any) {
+export async function GET(req: NextRequest) {
   await connectToDatabase()
   
 
@@ -22,20 +22,17 @@ export async function GET(req: NextRequest, res: any) {
 }
 
 // POST /api/reviews
-export async function POST(req: NextRequest, res: any) {
+export async function POST(req: NextRequest) {
   await connectToDatabase()
   const data = await req.json()
-
 
   const secret = req.headers.get('x-api-secret');
 
   if (secret !== process.env.API_SECRET_KEY) {
     return NextResponse.json({ message: 'Unauthorized' }, {status: 401});
-  }
+  }  
 
-  
-
-  const { productId, rating, customerName, comment } = data
+  const { productId, shopName, shopId, rating, customerName, title, comment } = data
 
   if (!productId || !rating) {
     return NextResponse.json(
@@ -45,12 +42,14 @@ export async function POST(req: NextRequest, res: any) {
   }
 
 
-  console.log(productId, rating, customerName, comment, "----------------")
 
   const newReview = new Review({
     productId,
+    shopName,
+    shopId,
     rating,
     customerName,
+    title,
     comment
   })
 
