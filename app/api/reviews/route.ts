@@ -3,27 +3,8 @@ import { connectToDatabase } from '@/lib/db'
 import Review, {IReview} from '@/models/Review'
 import { NextRequest, NextResponse } from 'next/server'
 
-// GET /api/reviews?productId=...
-// export async function GET(req: NextRequest) {
-//   await connectToDatabase()
-  
 
-//   const secret = req.headers.get('x-api-secret');
-
-//   if (secret !== process.env.API_SECRET_KEY) {
-//     return NextResponse.json({ message: 'Unauthorized' }, {status: 401});
-//   }
-
-//   const productId = req.nextUrl.searchParams.get('productId')
-//   const query = productId ? { productId } : {}
-
-//   const reviews: IReview[] = await Review.find(query).sort({ createdAt: -1 })
-//   return NextResponse.json(reviews)
-// }
-
-
-
-
+// app/api/reviews/route.ts
 export async function GET(req: NextRequest) {
   await connectToDatabase()
 
@@ -34,10 +15,13 @@ export async function GET(req: NextRequest) {
 
   const searchParams = req.nextUrl.searchParams
   const productId = searchParams.get('productId')
+  const shopId = searchParams.get('shopId')  // New support for shopId
   const page = parseInt(searchParams.get('page') || '1', 10)
   const limit = parseInt(searchParams.get('limit') || '10', 10)
 
-  const query = productId ? { productId } : {}
+  const query: any = {}
+  if (productId) query.productId = productId
+  if (shopId) query.shopId = shopId
 
   const skip = (page - 1) * limit
 
