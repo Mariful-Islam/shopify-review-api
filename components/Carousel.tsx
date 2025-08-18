@@ -6,6 +6,7 @@ import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
+import Image from 'next/image';
 
 
 
@@ -22,7 +23,7 @@ export default function Carousel({images}: {images: any[]}) {
     >
       {images?.map((src:any, index:number) => (
         <SwiperSlide key={index}>
-          <img src={src.src} alt={`Slide ${index + 1}`} className="w-full h-auto object-cover" />
+          <Image src={src.src} alt={`Slide ${index + 1}`} className="w-full h-auto object-cover" />
         </SwiperSlide>
       ))}
     </Swiper>
