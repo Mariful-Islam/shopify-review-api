@@ -1,12 +1,22 @@
 import Image from "next/image";
 import React from "react";
 import star from "@/assets/star.svg";
-import scr1 from "@/assets/Screenshot from 2025-08-13 15-10-03.png";
-import scr2 from "@/assets/Screenshot from 2025-08-13 15-11-05.png";
+import scr1 from "@/assets/Screenshot from 2025-08-18 11-38-28.png";
+import scr2 from "@/assets/Screenshot from 2025-08-18 11-39-00.png";
+import scr3 from "@/assets/Screenshot from 2025-08-18 11-40-14.png";
+import scr4 from "@/assets/Screenshot from 2025-08-18 11-40-19.png"
+
+import Carousel from "./Carousel";
 
 function Hero() {
+
+  const items = [
+    scr1, scr2, scr3, scr4
+  ]
+
+
   return (
-    <div className="h-[500px] flex justify-center items-center text-start px-6 relative">
+    <div className="h-[500px] flex justify-center items-center gap-6 text-start px-6 relative">
 
       <div className="w-1/2">
         <h1 className="text-2xl sm:text-4xl font-extrabold">
@@ -17,8 +27,7 @@ function Hero() {
       </div>
 
       <div className="flex w-1/2 ">
-        <Image src={scr2} alt="" className="h-[400px] w-[400px] object-cover" />
-        {/* <Image src={scr2} alt='' /> */}
+        <Carousel images={items} />
       </div>
     </div>
   );
