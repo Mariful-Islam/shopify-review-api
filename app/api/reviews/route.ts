@@ -83,3 +83,61 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json(newReview, { status: 201 })
 }
+
+
+
+// PUT /api/reviews (Update a review)
+export async function PUT(req: NextRequest) {
+  await connectToDatabase()
+  const secret = req.headers.get('x-api-secret')
+  if (secret !== process.env.API_SECRET_KEY) {
+    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
+  }
+
+  const data = await req.json()
+  const { reviewId, ...updateData } = data
+
+  if (!reviewId) {
+    return NextResponse.json({ error: 'Missing reviewId' }, { status: 400 })
+  }
+
+  const updatedReview = await Review.findByIdAndUpdate(reviewId, updateData, {
+    new: true,
+  })
+
+  if (!updatedReview) {
+    return NextResponse.json({ error: 'Review not found' }, { status: 404 })
+  }
+
+  return NextResponse.json(updatedReview, { status: 200 })
+}
+
+
+
+
+
+// DELETE /api/reviews?reviewId=xxx
+export async function DELETE(req: NextRequest) {
+  await connectToDatabase()
+  
+  const secret = req.headers.get('x-api-secret')
+
+  if (secret !== process.env.API_SECRET_KEY) {
+    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
+  }
+
+  const reviewId = req.nextUrl.searchParams.get('reviewId')
+
+  if (!reviewId) {
+    return NextResponse.json({ error: 'Missing reviewId' }, { status: 400 })
+  }
+
+  const deletedReview = await Review.findByIdAndDelete(reviewId)
+
+  if (!deletedReview) {
+    return NextResponse.json({ error: 'Review not found' }, { status: 404 })
+  }
+
+  return NextResponse.json({ message: 'Review deleted' }, { status: 200 })
+}
+
