@@ -3,6 +3,8 @@ import mongoose, { Document, Model, Schema } from 'mongoose'
 
 export interface IReview extends Document {
   productId: string
+  productName: string
+  productImage?: string
   shopName: string
   shopId: string
   customerName?: string
@@ -14,6 +16,8 @@ export interface IReview extends Document {
 
 const ReviewSchema: Schema = new mongoose.Schema<IReview>({
   productId: { type: String, required: true },
+  productName: { type: String, required: true },
+  productImage: { type: String },
   shopName: { type: String, required: true },
   shopId: { type: String, required: true },
   customerName: { type: String },

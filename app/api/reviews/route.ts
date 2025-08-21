@@ -15,13 +15,42 @@ export async function GET(req: NextRequest) {
 
   const searchParams = req.nextUrl.searchParams
   const productId = searchParams.get('productId')
-  const shopId = searchParams.get('shopId')  // New support for shopId
+  const shopId = searchParams.get('shopId')
+  const all = searchParams.get('all') === 'true'
   const page = parseInt(searchParams.get('page') || '1', 10)
   const limit = parseInt(searchParams.get('limit') || '10', 10)
+
+  const search = searchParams.get('search')
 
   const query: any = {}
   if (productId) query.productId = productId
   if (shopId) query.shopId = shopId
+
+  if (search) {
+    const searchRegex = new RegExp(search, 'i') // case-insensitive
+
+    query.$or = [
+      { shopName: { $regex: searchRegex } },
+      { customerName: { $regex: searchRegex } },
+      { title: { $regex: searchRegex } },
+      { comment: { $regex: searchRegex } },
+    ]
+  }
+
+  
+
+  if (all) {
+    const reviews = await Review.find(query).sort({ createdAt: -1 })
+    return NextResponse.json({
+      reviews,
+      pagination: {
+        total: reviews.length,
+        page: 1,
+        limit: reviews.length,
+        totalPages: 1,
+      },
+    })
+  }
 
   const skip = (page - 1) * limit
 
@@ -45,8 +74,6 @@ export async function GET(req: NextRequest) {
 }
 
 
-
-
 // POST /api/reviews
 export async function POST(req: NextRequest) {
   await connectToDatabase()
@@ -58,7 +85,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ message: 'Unauthorized' }, {status: 401});
   }  
 
-  const { productId, shopName, shopId, rating, customerName, title, comment } = data
+  const { productId, productName, productImage, shopName, shopId, rating, customerName, title, comment } = data
 
   if (!productId || !rating) {
     return NextResponse.json(
@@ -71,6 +98,8 @@ export async function POST(req: NextRequest) {
 
   const newReview = new Review({
     productId,
+    productName, 
+    productImage,
     shopName,
     shopId,
     rating,
